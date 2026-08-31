@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PIRITRONICKS - Sintonizador de Cumpleaños</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #050505;
+            overflow: hidden;
+        }
+
+        body {
+            color: #fff;
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* EL CHASIS: Estructura vertical estable */
+        .piritronicks-system {
+            width: 100%;
+            height: 100%;
+            max-width: 480px; 
+            padding: 25px 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+
+            /* Textura de Aluminio Cepillado Anodizado */
+            background: 
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(0deg, rgba(255,255,255,0.02) 1px, transparent 1px),
+                linear-gradient(180deg, #222 0%, #161616 50%, #0d0d0d 100%);
+            background-size: 3px 3px, 3px 3px, 100% 100%;
+            
+            border: none;
+            box-shadow: inset 0 1px 2px rgba(255,255,255,0.15);
+        }
+
+        /* Encabezado de la Marca */
+        .brand-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            flex-shrink: 0;
+            border-bottom: 1px solid #222;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+        }
+        .brand-logo {
+            font-size: 1.4rem;
+            color: #d11a2a; 
+            letter-spacing: 4px;
+            font-weight: 900;
+            font-style: italic;
+            text-shadow: 1px 1px 0px #000;
+            margin: 0;
+        }
+        .model-number {
+            font-size: 0.65rem;
+            color: #555;
+            font-weight: bold;
+        }
+
+        /* SOLUCIÓN: PANTALLA GIGANTE BASADA EN EL ALTO DEL CELULAR */
+        .lcd-display {
+            background-color: #080806;
+            border: 3px solid #1c1c1c;
+            border-top-color: #050505;
+            border-left-color: #050505;
+            padding: 25px 20px;
+            border-radius: 12px;
+            
+            /* Ocupa exactamente el 45% del alto total de cualquier celular de forma estricta */
+            height: 45vh; 
+            flex-shrink: 0; 
+            
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: inset 0 8px 25px rgba(0,0,0,0.95);
+            box-sizing: border-box;
+            margin-bottom: 25px;
+            transition: background-color 0.4s ease, border-color 0.4s ease, box-shadow 0.4s ease;
+        }
+        .piritronicks-system.on .lcd-display {
+            background-color: #241200;
+            border-color: #ff9900;
+            box-shadow: 
+                inset 0 0 40px rgba(255, 119, 0, 0.6),
+                0 0 15px rgba(255, 153, 0, 0.1);
+        }
+
+        /* Frecuencias del Dial */
+        .frequencies {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #1f1a15;
+            font-weight: bold;
+            padding: 0 5px;
+            box-sizing: border-box;
+            transition: color 0.3s ease;
+            flex-shrink: 0;
+        }
+        .piritronicks-system.on .frequencies {
+            color: #ff8800;
+            text-shadow: 0 0 5px rgba(255, 136, 0, 0.4);
+        }
+
+        /* Contenedor estático para congelar el texto en el centro */
+        .lcd-text-container {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            box-sizing: border-box;
+            padding: 10px 0;
+        }
+
+        .lcd-text {
+            color: #1a1612;
+            font-size: 1.15rem; 
+            font-weight: bold;
+            text-transform: uppercase;
+            text-align: center;
+            line-height: 1.5;
+            letter-spacing: 1px;
+            transition: color 0.3s ease;
+        }
+        .piritronicks-system.on .lcd-text {
+            color: #ffaa00;
+            text-shadow: 0 0 12px rgba(255, 170, 0, 0.8), 0 0 25px rgba(255, 119, 0, 0.4);
+        }
+
+        /* El riel del dial */
+        .dial-line {
+            width: 100%;
+            height: 4px;
+            background-color: #111;
+            position: relative;
+            border-radius: 2px;
+            margin-top: 15px;
+            flex-shrink: 0;
+        }
+        .piritronicks-system.on .dial-line { background-color: #3d1f00; }
+        .needle {
+            width: 4px;
+            height: 16px;
+            background-color: #222;
+            position: absolute;
+            top: -6px;
+            left: 0%;
+            transition: left 0.1s linear;
+        }
+        .piritronicks-system.on .needle {
+            background-color: #ff2222;
+            box-shadow: 0 0 8px #ff0000;
+        }
+
+        /* PANEL DE CONTROL: Fijo abajo de la pantalla ahumada */
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-shrink: 0;
+        }
+        .btn-hardware {
+            background: linear-gradient(180deg, #444 0%, #222 48%, #141414 52%, #111 100%);
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #666;
+            padding: 16px 2px;
+            font-size: 0.7rem;
+            font-weight: bold;
+            font-family: inherit;
+            cursor: pointer;
+            box-shadow: 0 4px 5px rgba(0,0,0,0.5);
+            transition: all 0.1s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .btn-hardware:active {
+            transform: translateY(2px);
+            box-shadow: 0 1px 1px rgba(0,0,0,0.7);
+            background: linear-gradient(180deg, #111 0%, #222 100%);
+        }
+        .btn-power {
+            background: linear-gradient(180deg, #7c1a1a 0%, #4a0f0f 48%, #2e0909 52%, #1a0505 100%);
+            border-color: #441111;
+            color: #945555;
+        }
+        .piritronicks-system.on .btn-power {
+            background: linear-gradient(180deg, #d92626 0%, #a61c1c 48%, #731313 52%, #4a0f0f 100%);
+            color: #fff;
+            box-shadow: 0 0 12px rgba(255, 34, 34, 0.4);
+        }
+        .piritronicks-system.on .btn-hardware:not(.btn-power) {
+            color: #ccc;
+            border-color: #444;
+        }
+
+        /* ÁREA INTERACTIVA: Se expande en el espacio restante sin empujar nada */
+        .action-area {
+            flex-grow: 1; 
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-sizing: border-box;
+            padding: 10px 0;
+            width: 100%;
+        }
+
+        .action-area > div {
+            width: 100%;
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .btn-action {
+            display: block;
+            width: 100%;
+            background: linear-gradient(180deg, #ffb732 0%, #ff9900 100%);
+            color: #000;
+            text-decoration: none;
+            padding: 18px 15px; 
+            text-align: center;
+            border-radius: 8px;
+            font-weight: 900;
+            font-size: 0.95rem;
+            letter-spacing: 0.5px;
+            box-shadow: 0 6px 20px rgba(255, 153, 0, 0.4);
+            border: 1px solid #cc7a00;
+            box-sizing: border-box;
+        }
+        .btn-action:active {
+            transform: scale(0.97);
+        }
+
+
+    </style>
+</head>
+<body> 
+
+    <div class="piritronicks-system" id="stereo">
+        <span class="model-number">PT-2109-77</span>
+        <div class="brand-logo">PIRITRONICKS</div>
+        
+<!-- PANTALLA LCD COMPLETA -->
+        <div class="lcd-display">
+            <div class="frequencies">
+                <span>91.5</span>
+                <span>95.0</span>
+                <span>99.0</span>
+                <span>102.5</span>
+                <span>106.0</span>
+            </div>
+            <div class="lcd-text-container">
+                <div class="lcd-text" id="lcdDisplay">POWER OFF</div>
+            </div>
+            <div class="dial-line">
+                <div class="needle" id="needle"></div>
+            </div>
+        </div>
+
+        <!-- BOTONES FÍSICOS -->
+        <div class="control-panel">
+            <button class="btn-hardware btn-power" id="powerBtn" onclick="togglePower()">ON/OFF</button>
+            <button class="btn-hardware" onclick="tune(-1)">◄ TUNE-</button>
+            <button class="btn-hardware" onclick="tune(1)">TUNE+ ►</button>
+            <button class="btn-hardware" onclick="startScan()">SCAN</button>
+        </div>
+
+        <!-- ÁREA INTERACTIVA -->
+        <div class="action-area" id="actionArea"></div>
+    </div>
+
+    <!-- AUDIOS (Cambia los nombres a tus archivos reales .mp3) -->
+    <audio id="staticNoise" loop src="estatica.mp3"></audio>
+    <audio id="ch1" loop src="spot_anuncio.mp3"></audio>
+    <audio id="ch2" loop src="cancion_hit.mp3"></audio>
+    <audio id="ch3" loop src="audio_ubicacion.mp3"></audio>
+    <audio id="ch4" loop src="audio_whatsapp.mp3"></audio>
+    <audio id="ch5" loop src="audio_playlist.mp3"></audio>
+
+    <script>
+    let isOn = false;
+    let currentFreq = 915; 
+    let isScanning = false;
+    let isTransitioning = false; 
+    let scanInterval;
+
+    const stereo = document.getElementById('stereo');
+    const lcdDisplay = document.getElementById('lcdDisplay');
+    const needle = document.getElementById('needle');
+    const actionArea = document.getElementById('actionArea');
+    const staticNoise = document.getElementById('staticNoise');
+
+    // Lista fija para ordenar el salto directo entre las 5 frecuencias
+    const stationsOrder = [915, 950, 990, 1025, 1060];
+
+    const stations = {
+        915: { 
+            name: "91.5 FM - ANUNCIO OFICIAL", 
+            audio: document.getElementById('ch1'), 
+            content: '<div style="color:#ffaa00; font-size:0.85rem; border: 1px dashed #ffaa00; padding: 10px; border-radius: 4px; background: rgba(255,170,0,0.05);">📡 ¡TRANSMISIÓN ESPECIAL!<br>Escucha el spot de mi cumpleaños.</div>' 
+        },
+        950: { 
+            name: "95.0 FM - THE HIT STATION", 
+            audio: document.getElementById('ch2'), 
+            content: '<div style="color:#ffaa00; font-size:0.85rem; padding: 5px;">🎵 REPRODUCIENDO: El rompepistas de la noche.<br><span style="font-size:0.75rem; color:#888;">Sube el volumen y disfruta.</span></div>' 
+        },
+        990: { 
+            name: "99.0 FM - RADAR DE RUTA", 
+            audio: document.getElementById('ch3'), 
+            content: '<div style="margin-bottom: 10px; font-size: 0.75rem; color: #ffaa00;">🗺️ SEÑAL DE UBICACIÓN DETECTADA:</div><a href="https://google.com" target="_blank" class="btn-action">📍 ABRIR GOOGLE MAPS</a>' 
+        },
+        1025: { 
+            name: "102.5 FM - LÍNEA DIRECTA RSVP", 
+            audio: document.getElementById('ch4'), 
+            content: '<div style="margin-bottom: 10px; font-size: 0.75rem; color: #ffaa00;">📞 CABINA ABIERTA:</div><a href="https://wa.me¡Hola!%20Confirmo%20mi%20asistencia%20a%20tu%20cumpleaños" target="_blank" class="btn-action">✓ CONFIRMAR POR WHATSAPP</a>' 
+        },
+        1060: { 
+            name: "106.0 FM - MIXTAPE RADIO", 
+            audio: document.getElementById('ch5'), 
+            content: '<div style="color:#ffaa00; font-size:0.85rem; padding: 5px;">💿 EN SINTONÍA: Avance exclusivo del Soundtrack del 21 de Septiembre.</div>' 
+        }
+    };
+
+    function togglePower() {
+        isOn = !isOn;
+        if(isOn) {
+            stereo.classList.add('on');
+            staticNoise.play().catch(()=>{});
+            staticNoise.volume = 0.0;
+            updateRadio();
+        } else {
+            clearInterval(scanInterval);
+            isScanning = false;
+            isTransitioning = false;
+            stereo.classList.remove('on');
+            lcdDisplay.innerHTML = "POWER OFF";
+            needle.style.left = "0%";
+            actionArea.innerHTML = '';
+            staticNoise.pause();
+            stopAllStations();
+        }
+    }
+
+    function tune(direction) {
+        if (!isOn || isTransitioning) return;
+        clearInterval(scanInterval);
+        isScanning = false;
+
+        let currentIndex = stationsOrder.indexOf(currentFreq);
+        let nextIndex = currentIndex + direction;
+
+        if (nextIndex >= stationsOrder.length) nextIndex = 0;
+        if (nextIndex < 0) nextIndex = stationsOrder.length - 1;
+
+        let targetFreq = stationsOrder[nextIndex];
+        animateTuning(currentFreq, targetFreq);
+    }
+
+    function animateTuning(start, end) {
+        isTransitioning = true;
+        actionArea.innerHTML = ''; 
+        stopAllStations();
+        
+        staticNoise.volume = 1.0; 
+
+        const duration = 2000; 
+        const startTime = performance.now();
+
+        function step(now) {
+            const progress = Math.min((now - startTime) / duration, 1);
+            let intermediateFreq = Math.round(start + (end - start) * progress);
+            
+            let porcentaje = ((intermediateFreq - 900) / 180) * 100;
+            needle.style.left = `${porcentaje}%`;
+            
+            lcdDisplay.innerHTML = `TUNING...<br>${(intermediateFreq / 10).toFixed(1)} FM`;
+
+            if (progress < 1) {
+                requestAnimationFrame(step);
+            } else {
+                currentFreq = end;
+                isTransitioning = false;
+                updateRadio();
+            }
+        }
+        requestAnimationFrame(step);
+    }
+
+    function startScan() {
+        if (!isOn || isScanning || isTransitioning) return;
+        isScanning = true;
+        actionArea.innerHTML = '';
+        
+        let currentIndex = stationsOrder.indexOf(currentFreq);
+        
+        scanInterval = setInterval(() => {
+            currentIndex++;
+            if (currentIndex >= stationsOrder.length) currentIndex = 0;
+            
+            let targetFreq = stationsOrder[currentIndex];
+            clearInterval(scanInterval); 
+            
+            animateTuning(currentFreq, targetFreq);
+            
+            setTimeout(() => {
+                if (isOn && isScanning && !isTransitioning) {
+                    isScanning = false; 
+                    startScan();
+                }
+            }, 7000);
+        }, 100);
+    }
+
+    function updateRadio() {
+        let porcentaje = ((currentFreq - 900) / 180) * 100;
+        needle.style.left = `${porcentaje}%`;
+        
+        stopAllStations();
+
+        if (stations[currentFreq]) {
+            let stationAudio = stations[currentFreq].audio;
+            if (stationAudio.paused) stationAudio.play().catch(()=>{});
+            
+            stationAudio.volume = 1.0;
+            staticNoise.volume = 0.0; 
+
+            lcdDisplay.innerHTML = `📟 TUNED<br>${stations[currentFreq].name}`;
+            actionArea.innerHTML = stations[currentFreq].content;
+        }
+    }
+
+    function stopAllStations() {
+        for (let freq in stations) {
+            stations[freq].audio.pause();
+            stations[freq].audio.currentTime = 0;
+        }
+    }
+</script>
+</body>
+</html>
